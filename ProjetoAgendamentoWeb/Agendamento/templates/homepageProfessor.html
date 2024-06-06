@@ -1,0 +1,73 @@
+{% extends "indexProfessor.html" %}
+{% load static %}
+
+{% block body %}
+<div class="container1">
+    <h1>Agendamento de salas</h1>
+    <p>Apenas permissão dos Professores e coordenadores</p>
+    <div class="table-actions">
+        <form id="deleteForm" method="POST" action="{% url 'homepageProfessor' %}">
+            {% csrf_token %}
+            <input type="hidden" name="delete" value="delete">
+            <input type="hidden" id="selectedIds" name="selected_ids">  
+        </form>
+        <button id="filterBtn">Filters</button>
+        <button id="exportBtn">Export</button>
+        <button id="addBtn" class="add-new" {% if all_booked %}disabled{% endif %}>Agendar</button>
+    </div>
+    <table class="student-table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll"><label for="selectAll"></label></th>
+                <th>Sala</th>      
+                <th>Descrição</th>
+                <th>Equipamentos</th>
+                <th>Agendamento</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in dadosSalas %}
+                <tr>
+                    <td><input type="checkbox" class="select-row" data-id="{{ item.id }}" data-sala="{{ item.salas }}" id="checkbox{{ forloop.counter }}"><label for="checkbox{{ forloop.counter }}"></label></td>
+                    <td>{{ item.salas }}</td>
+                    <td>{{ item.descricao }}</td>
+                    <td>{{ item.equipamentos }}</td>
+                    <td class="status {% if all_booked %}inactive{% else %}active{% endif %}">{{ item.agendamento }}</td>
+                </tr>
+            {% endfor %}
+            {% if all_booked %}
+                <tr>
+                    <td colspan="6" style="text-align:center; color:red;">Indisponível</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div id="addRoomModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Realizar Agendamento</h2>
+        <form id="addRoomForm" method="POST" action="{% url 'homepageProfessor' %}">
+            {% csrf_token %}
+            <input type="hidden" id="salaId" name="sala_id">
+            <label for="roomName">Sala:</label>
+            <input type="text" id="roomName" name="salas" placeholder="Nome da Sala" readonly>
+            <label for="roomDate">Data:</label>
+            <input type="date" id="roomDate" name="data" placeholder="Data">
+            <label for="roomTime">Horário:</label>
+            <select id="roomTime" name="horario"></select>
+            <button type="submit" class="add-btn">Agendar</button>
+        </form>
+    </div>
+</div>
+
+<div id="filterModal" class="modal">
+    <div class="modal-content">
+        <h2>Escolha o tipo de filtro</h2>
+        <button id="filterAZBtn">A - Z</button>
+        <button id="filterNumBtn">Z - A</button>
+    </div>
+</div>
+{% endblock %}
